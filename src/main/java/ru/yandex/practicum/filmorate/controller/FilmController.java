@@ -87,8 +87,7 @@ public class FilmController {
         }
         if (film.getDescription().length() > 200) {
             log.info("Описание фильма превышает длину в 200 символов=" + film.getDescription().length());
-            String maxLength = film.getDescription().substring(0, 200);
-            film.setDescription(maxLength);
+            throw new ValidationException("Описание фильма превышает длину в 200 символов");
         }
         if (minutes < 0) {
             log.info("Валидация не прошла: продолжительность фильма отрицательная=" + film.getDuration());
