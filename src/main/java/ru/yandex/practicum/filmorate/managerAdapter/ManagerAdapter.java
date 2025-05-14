@@ -5,7 +5,6 @@ import com.google.gson.GsonBuilder;
 import ru.yandex.practicum.filmorate.adapter.DurationAdapter;
 import ru.yandex.practicum.filmorate.adapter.LocalDateAdapter;
 
-import java.time.Duration;
 import java.time.LocalDate;
 
 public class ManagerAdapter {
