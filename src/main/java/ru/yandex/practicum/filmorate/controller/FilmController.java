@@ -78,7 +78,7 @@ public class FilmController {
 
     private void getValidation(Film film) {
 
-        long minutes = film.getDuration().toMinutes();
+        long minutes = film.getDuration();
         LocalDate yearBirthMovies = LocalDate.of(1895, 12, 28);
 
         if (film.getName() == null || film.getName().isBlank()) {

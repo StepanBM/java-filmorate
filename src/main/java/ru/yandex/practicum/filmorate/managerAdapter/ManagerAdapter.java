@@ -13,7 +13,7 @@ public class ManagerAdapter {
     public static Gson getGson() {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
-        gsonBuilder.registerTypeAdapter(Duration.class, new DurationAdapter());
+        gsonBuilder.registerTypeAdapter(Long.class, new DurationAdapter());
         return gsonBuilder.create();
 
     }

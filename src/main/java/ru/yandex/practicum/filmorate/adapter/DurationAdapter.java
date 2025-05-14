@@ -7,26 +7,26 @@ import com.google.gson.stream.JsonWriter;
 import java.io.IOException;
 import java.time.Duration;
 
-public class DurationAdapter extends TypeAdapter<Duration> {
+public class DurationAdapter extends TypeAdapter<Long> {
 
     @Override
-    public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
+    public void write(final JsonWriter jsonWriter, final Long duration) throws IOException {
         if (duration == null) {
             jsonWriter.nullValue();
             return;
         }
-        jsonWriter.value(duration.toMinutes());
+        jsonWriter.value(duration);
     }
 
     @Override
-    public Duration read(final JsonReader jsonReader) throws IOException {
+    public Long read(final JsonReader jsonReader) throws IOException {
 
-        final String text = jsonReader.nextString();
-        if (text.equals("null")) {
+        final long minutes = jsonReader.nextLong();
+        if (minutes == 0) {
             return null;
         }
 
-        return Duration.ofMinutes(Long.parseLong(text));
+        return minutes;
 
         // Ожидается целое число минут
 //        long minutes = jsonReader.nextLong();
