@@ -20,7 +20,7 @@ public class UserController {
     private final Map<Long, User> users = new HashMap<>();
     final Gson gson = ManagerAdapter.getGson();
 
-    private final static Logger log = LoggerFactory.getLogger(UserController.class);
+    private final Logger log = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping
     public Collection<User> findAll() {
