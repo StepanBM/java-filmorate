@@ -24,11 +24,6 @@ public class DurationAdapter extends TypeAdapter<Long> {
         if (minutes == 0) {
             return null;
         }
-
         return minutes;
-
-        // Ожидается целое число минут
-//        long minutes = jsonReader.nextLong();
-//        return Duration.ofMinutes(minutes);
     }
 }
