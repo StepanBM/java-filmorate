@@ -1,26 +1,25 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import java.time.LocalDate;
 
 @Data
 public class User {
 
-    long id;
+    private long id;
 
     @Email(message = "Некорректный формат email")
     @NotBlank(message = "Email не может быть пустым")
-    @NotNull(message = "Email не может быть null")
-    String email;
+    private String email;
 
-    String login;
-    String name;
+    private String login;
+
+    @NotNull(message = "Имя пользователя не может быть null")
+    private String name;
 
     @Past(message = "Дата рождения не должны быть в будущем")
-    LocalDate birthday;
+    @NotNull(message = "Дата рождения не может быть null")
+    private LocalDate birthday;
 
 }

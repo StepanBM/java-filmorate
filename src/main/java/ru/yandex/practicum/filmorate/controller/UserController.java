@@ -72,7 +72,7 @@ public class UserController {
             log.info("Валидация не прошла: некорректный login=" + user.getLogin());
             throw new ValidationException("Login не может быть пустым или содержать пробелы");
         }
-        if (user.getName() == null || user.getName().isBlank()) {
+        if (user.getName().isBlank()) {
             log.info("Имя не указано, присвоено значение login=" + user.getLogin());
             user.setName(user.getLogin());
         }
