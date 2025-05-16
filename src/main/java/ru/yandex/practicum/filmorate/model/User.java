@@ -14,8 +14,6 @@ public class User {
     private String email;
 
     private String login;
-
-    @NotNull(message = "Имя пользователя не может быть null")
     private String name;
 
     @Past(message = "Дата рождения не должны быть в будущем")
