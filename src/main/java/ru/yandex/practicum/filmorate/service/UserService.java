@@ -92,6 +92,9 @@ public class UserService {
         List<User> listFrinds = new ArrayList<>();
         for (User userList : userStorage.findAll()) {
             if (userList.getId() == userId) {
+                if (userList.getFriends() == null) {
+                    return new ArrayList<>();
+                }
                 for (Long idFrinds: userList.getFriends()) {
                     for (User user : userStorage.findAll()) {
                         if (user.getId() == idFrinds) {
@@ -101,6 +104,7 @@ public class UserService {
                 }
             }
         }
+
         return listFrinds;
     }
 
