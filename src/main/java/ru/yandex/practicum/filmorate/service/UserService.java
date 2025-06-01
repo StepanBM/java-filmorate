@@ -66,6 +66,9 @@ public class UserService {
             return;
         }
         for (User user : userStorage.findAll()) {
+            if (user.getId() == userId && user.getFriends() == null) {
+                return;
+            }
             if (user.getId() == userId && user.getFriends().contains(friendId)) {
                 Set<Long> userFriends = user.getFriends();
                 userFriends = new HashSet<>(userFriends);
