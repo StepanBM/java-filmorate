@@ -21,7 +21,7 @@ public class UserService {
 
     public void addFriends(long userId, long friendId) {
         // Проверяем, есть ли фильм
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId()==userId || users.getId()==friendId))) {
+        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
             System.out.println("Пользователь не найден");
             return;
         }
@@ -61,7 +61,7 @@ public class UserService {
 
     public void deleteUserFriends(long userId, long friendId) {
         // Проверяем, есть ли фильм
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId()==userId || users.getId()==friendId))) {
+        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
             System.out.println("Пользователь не найден");
             return;
         }
@@ -86,7 +86,7 @@ public class UserService {
     }
 
     public List<User> getlListFriends(long userId) {
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId()==userId))) {
+        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
             System.out.println("Пользователь не найден");
         }
         List<User> listFrinds = new ArrayList<>();

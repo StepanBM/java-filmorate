@@ -23,7 +23,7 @@ public class FilmService {
 
     public void addLike(long filmId, long userId) {
         // Проверяем, есть ли фильм
-        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId()==filmId))) {
+        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId))) {
             System.out.println("Фильм не найден");
             return;
         }
@@ -61,8 +61,8 @@ public class FilmService {
 
     public void deleteLike(long filmId, long userId) {
         // Проверяем, есть ли фильм
-        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId()==filmId) ||
-                userStorage.findAll().stream().anyMatch(users -> users.getId()==userId))) {
+        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId) ||
+                userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
             System.out.println("Фильм не найден");
             return;
         }
