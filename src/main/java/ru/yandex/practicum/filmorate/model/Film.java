@@ -16,11 +16,14 @@ public class Film {
     @NotNull(message = "Описание фильма не может быть null")
     private String description;
 
-    @NotNull(message = "Дата релиза не может быть null")
+    @NotNull(message = "Дата релиза фильма не может быть null")
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     @NotNull(message = "Продолжительность фильма не может быть null")
     private long duration;
+
+    // количество лайков у фильма
+    private Long filmLikesCount;
 
 }

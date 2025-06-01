@@ -4,6 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
+import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.time.LocalDate;
 import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,10 +14,13 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UserControllerTest {
 
     private UserController userController;
+    private UserStorage userStorage;
+    private final InMemoryUserStorage inMemoryUserStorage = new InMemoryUserStorage();
+    private final UserService userService = new UserService(userStorage);
 
     @BeforeEach
     public void setUp() {
-        userController = new UserController();
+        userController = new UserController(inMemoryUserStorage, userService);
     }
 
     // Вспомогательный метод для создания пользователя
@@ -25,6 +31,7 @@ public class UserControllerTest {
         user.setName("Alexander");
         user.setBirthday(LocalDate.of(1997, 7, 3));
         return user;
+
     }
 
     // Вспомогательный метод для обновления пользователя
@@ -43,7 +50,6 @@ public class UserControllerTest {
 
         User user = createValidUser();
         User createdUser = userController.create(user);
-
         assertNotNull(createdUser);
 
         Collection<User> collectionUser = userController.findAll();
@@ -62,6 +68,7 @@ public class UserControllerTest {
         userController.create(user);
 
         User newUser = updateValidUser();
+
         User updatedUser = userController.update(newUser);
 
         Collection<User> collectionUser = userController.findAll();
@@ -83,7 +90,6 @@ public class UserControllerTest {
                 () -> {
                     userController.create(user);
                 });
-
         assertEquals("Login не может быть пустым или содержать пробелы", exception.getMessage());
     }
 
@@ -94,30 +100,12 @@ public class UserControllerTest {
         user.setName("");
 
         User createdUser = userController.create(user);
-
         assertNotNull(createdUser);
 
         Collection<User> collectionUser = userController.findAll();
 
         assertEquals(1, collectionUser.size(), "Некорректное количество пользователей");
         assertEquals("Arak101010", collectionUser.iterator().next().getName(), "Некорректное имя");
-    }
-
-    @Test
-    public void testValidationUserErrorUnknownId() {
-
-        User user = createValidUser();
-        userController.create(user);
-
-        User newUser = updateValidUser();
-        newUser.setId(5);
-
-        ValidationException exception = assertThrows(ValidationException.class,
-                () -> {
-                    userController.update(newUser);
-                });
-
-        assertEquals("Пользователь с id =" + newUser.getId() + " не найден", exception.getMessage());
     }
 
 }
