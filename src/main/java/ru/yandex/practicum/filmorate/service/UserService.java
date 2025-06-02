@@ -24,8 +24,10 @@ public class UserService {
         // Проверяем, есть ли пользователь
         boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
         boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
-        if (!(existsUser || existsUser2)) {
-            throw new NotFoundException("Пользователь не найден");
+        if (!existsUser) {
+            throw new NotFoundException("Пользователь №1 не найден");
+        } else if (!existsUser2) {
+            throw new NotFoundException("Пользователь №2 не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId) {
@@ -64,8 +66,10 @@ public class UserService {
         // Проверяем, есть ли пользователь
         boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
         boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
-        if (!(existsUser || existsUser2)) {
-            throw new NotFoundException("Пользователь не найден");
+        if (!existsUser) {
+            throw new NotFoundException("Пользователь №1 не найден");
+        } else if (!existsUser2) {
+            throw new NotFoundException("Пользователь №2 не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId && user.getFriends() == null) {

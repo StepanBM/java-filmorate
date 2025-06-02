@@ -26,8 +26,10 @@ public class FilmService {
         // Проверяем, есть ли фильм и пользователь
         boolean existsFilm = filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId);
         boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        if (!(existsFilm || existsUser)) {
-            throw new NotFoundException("Фильм или пользователь не найдены");
+        if (!existsFilm) {
+            throw new NotFoundException("Фильм не найден");
+        } else if (!existsUser) {
+            throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId) {
@@ -64,8 +66,10 @@ public class FilmService {
         // Проверяем, есть ли фильм и пользователь
         boolean existsFilm = filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId);
         boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        if (!(existsFilm || existsUser)) {
-            throw new NotFoundException("Фильм или пользователь не найдены");
+        if (!existsFilm) {
+            throw new NotFoundException("Фильм не найден");
+        } else if (!existsUser) {
+            throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId && user.getUserLikes().contains(filmId)) {
