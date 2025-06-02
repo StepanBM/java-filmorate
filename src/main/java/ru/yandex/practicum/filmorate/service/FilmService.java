@@ -45,8 +45,6 @@ public class FilmService {
                 filmLike.add(filmId);
                 user.setUserLikes(filmLike);
                 break;
-            } else {
-                throw new NotFoundException("Пользователь лайкнул фильм раннее");
             }
         }
         for (Film film : filmStorage.findAll()) {
