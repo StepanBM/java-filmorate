@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -23,17 +24,15 @@ public class FilmService {
 
     public void addLike(long filmId, long userId) {
         // Проверяем, есть ли фильм
-        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId))) {
-            System.out.println("Фильм не найден");
-            return;
+        if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId) ||
+                userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
+            throw new NotFoundException("Фильм не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId) {
                 Set<Long> filmLike = user.getUserLikes();
                 // Проверяем, лайкнул ли пользователь фильм ранее
                 if (filmLike != null && filmLike.contains(filmId)) {
-                    System.out.println("Пользователь уже лайкнул этот фильм.");
-                    return; // Выходим из метода, если лайк уже был
                 }
                 if (filmLike == null) {
                     filmLike = new HashSet<>();
@@ -63,8 +62,7 @@ public class FilmService {
         // Проверяем, есть ли фильм
         if (!(filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId) ||
                 userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
-            System.out.println("Фильм не найден");
-            return;
+            throw new NotFoundException("Фильм не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId && user.getUserLikes().contains(filmId)) {
@@ -81,7 +79,7 @@ public class FilmService {
                 return;
             }
         }
-        System.out.println("Данный пользователь не лайкал данный фильм");
+        throw new NotFoundException("Данный пользователь не лайкал данный фильм");
     }
 
     public Collection<Film> getPopularFilms(int count) {

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.ArrayList;
@@ -22,16 +23,14 @@ public class UserService {
     public void addFriends(long userId, long friendId) {
         // Проверяем, есть ли фильм
         if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
-            System.out.println("Пользователь не найден");
-            return;
+            throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId) {
                 Set<Long> userFriends = user.getFriends();
                 // Проверяем, добавлен ли пользователь раннее в друзья
                 if (userFriends != null && userFriends.contains(friendId)) {
-                    System.out.println("Пользователь уже находится в друзьях");
-                    return;
+                    throw new NotFoundException("Пользователь уже находится в друзьях");
                 }
                 if (userFriends == null) {
                     userFriends = new HashSet<>();
@@ -62,8 +61,7 @@ public class UserService {
     public void deleteUserFriends(long userId, long friendId) {
         // Проверяем, есть ли фильм
         if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
-            System.out.println("Пользователь не найден");
-            return;
+            throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
             if (user.getId() == userId && user.getFriends() == null) {
@@ -85,12 +83,12 @@ public class UserService {
                 }
             }
         }
-// System.out.println("Данный пользователь не лайкал данный фильм");
+ throw new NotFoundException("Данный пользователь не лайкал данный фильм");
     }
 
     public List<User> getlListFriends(long userId) {
         if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
-            System.out.println("Пользователь не найден");
+            throw new NotFoundException("Пользователь не найден");
         }
         List<User> listFrinds = new ArrayList<>();
         for (User userList : userStorage.findAll()) {
@@ -113,7 +111,7 @@ public class UserService {
 
     public List<User> getCommonlLstFriends(long userId, long otherId) {
         if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == otherId))) {
-            System.out.println("Пользователь не найден");
+            throw new NotFoundException("Пользователь не найден");
         }
         Set<Long> userFriends = new HashSet<>();
         Set<Long> userFriends2 = new HashSet<>();
