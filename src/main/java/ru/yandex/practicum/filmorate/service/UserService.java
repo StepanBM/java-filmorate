@@ -21,8 +21,10 @@ public class UserService {
     }
 
     public void addFriends(long userId, long friendId) {
-        // Проверяем, есть ли фильм
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
+        // Проверяем, есть ли пользователь
+        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
+        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
+        if (!(existsUser || existsUser2)) {
             throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
@@ -59,8 +61,10 @@ public class UserService {
     }
 
     public void deleteUserFriends(long userId, long friendId) {
-        // Проверяем, есть ли фильм
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == friendId))) {
+        // Проверяем, есть ли пользователь
+        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
+        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
+        if (!(existsUser || existsUser2)) {
             throw new NotFoundException("Пользователь не найден");
         }
         for (User user : userStorage.findAll()) {
@@ -87,7 +91,9 @@ public class UserService {
     }
 
     public List<User> getlListFriends(long userId) {
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId))) {
+        // Проверяем, есть ли пользователь
+        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
+        if (!(existsUser)) {
             throw new NotFoundException("Пользователь не найден");
         }
         List<User> listFrinds = new ArrayList<>();
@@ -110,7 +116,10 @@ public class UserService {
     }
 
     public List<User> getCommonlLstFriends(long userId, long otherId) {
-        if (!(userStorage.findAll().stream().anyMatch(users -> users.getId() == userId || users.getId() == otherId))) {
+        // Проверяем, есть ли пользователь
+        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
+        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == otherId);
+        if (!(existsUser || existsUser2)) {
             throw new NotFoundException("Пользователь не найден");
         }
         Set<Long> userFriends = new HashSet<>();
