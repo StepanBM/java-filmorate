@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import java.time.LocalDate;
@@ -44,7 +45,6 @@ public class InMemoryFilmStorage implements FilmStorage {
             log.error("Попытка обновления фильма без указания id");
             throw new ValidationException("Id должен быть указан");
         }
-        try {
             getValidationFilm(newFilm);
             if (films.containsKey(newFilm.getId())) {
                 Film oldFilm = films.get(newFilm.getId());
@@ -56,12 +56,8 @@ public class InMemoryFilmStorage implements FilmStorage {
                 return oldFilm;
             } else {
                 log.error("Фильм с таким id не найден");
-                throw new ValidationException("Фильм с id =" + newFilm.getId() + " не найден");
+                throw new NotFoundException("Фильм с id =" + newFilm.getId() + " не найден");
             }
-        } catch (Exception e) {
-            log.warn("Ошибка при обновлении фильма с id=" + newFilm.getId());
-            throw e;
-        }
     }
 
     private void getValidationFilm(Film film) {

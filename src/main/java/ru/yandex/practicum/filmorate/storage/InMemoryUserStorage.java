@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import java.util.Collection;
@@ -49,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
             return oldUser;
         } else {
             log.error("Пользователь с таким id не найден");
-            throw new ValidationException("Пользователь с id =" + newUser.getId() + " не найден"); ////////!!!!!!
+            throw new NotFoundException("Пользователь с id =" + newUser.getId() + " не найден"); ////////!!!!!!
         }
 
     }

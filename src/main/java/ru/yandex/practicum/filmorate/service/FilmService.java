@@ -33,6 +33,7 @@ public class FilmService {
                 Set<Long> filmLike = user.getUserLikes();
                 // Проверяем, лайкнул ли пользователь фильм ранее
                 if (filmLike != null && filmLike.contains(filmId)) {
+                    throw new NotFoundException("Пользователь лайкнул фильм раннее");
                 }
                 if (filmLike == null) {
                     filmLike = new HashSet<>();
