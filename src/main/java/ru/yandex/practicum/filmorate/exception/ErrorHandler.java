@@ -14,30 +14,6 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-//
-
-// @ExceptionHandler(DuplicatedDataException.class)
-
-// @ResponseStatus(HttpStatus.CONFLICT)
-
-// public ErrorResponse handleDuplicatedData(DuplicatedDataException e) {
-
-// return new ErrorResponse(e.getMessage());
-
-// }
-
-//
-
-// @ExceptionHandler(ConditionsNotMetException.class)
-
-// @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-
-// public ErrorResponse handleConditionsNotMet(ConditionsNotMetException e) {
-
-// return new ErrorResponse(e.getMessage());
-
-// }
-
     @ExceptionHandler(ValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrorResponse handleParameterNotValid(ValidationException e) {

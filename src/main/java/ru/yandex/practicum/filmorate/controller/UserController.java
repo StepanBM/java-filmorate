@@ -56,11 +56,3 @@ public class UserController {
     }
 
 }
-
-//@ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
-//@ExceptionHandler
-//@ResponseStatus(HttpStatus.BAD_REQUEST)
-//public Map<String, String> handle(final IncorrectCountException e) {
-// return Map.of("error", "Ошибка с параметром count",
-// "errorMessage", e.getMessage());
-//}

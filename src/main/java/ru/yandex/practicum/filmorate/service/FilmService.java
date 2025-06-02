@@ -98,24 +98,3 @@ public class FilmService {
     }
 
 }
-
-//@GetMapping("/posts")
-//public List<Post> findAll(
-// @RequestParam(defaultValue = "desc") String sort,
-// @RequestParam(defaultValue = "0") int from,
-// @RequestParam(defaultValue = "10") int size
-//) {
-// PostService.SortOrder sortOrder = PostService.SortOrder.from(sort);
-// if (sortOrder == null) {
-// throw new ParameterNotValidException("sort", "Получено: " + sort + " должно быть: ask или desc");
-// }
-// if (size <= 0) {
-// throw new ParameterNotValidException("size", "Размер должен быть больше нуля");
-// }
-//
-// if (from < 0) {
-// throw new ParameterNotValidException("from", "Начало выборки должно быть положительным числом");
-// }
-//
-// return postService.findAll(from, size, sortOrder);
-//}
