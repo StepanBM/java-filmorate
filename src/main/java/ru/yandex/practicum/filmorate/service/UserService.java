@@ -20,116 +20,91 @@ public class UserService {
         this.userStorage = userStorage;
     }
 
+    public User checkingIdUser(long id) {
+        return userStorage.findIdUser(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    }
+
     public void addFriends(long userId, long friendId) {
         // Проверяем, есть ли пользователь
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
-        if (!existsUser) {
-            throw new NotFoundException("Пользователь №1 не найден");
-        } else if (!existsUser2) {
-            throw new NotFoundException("Пользователь №2 не найден");
+        checkingIdUser(userId);
+        checkingIdUser(friendId);
+
+        Set<Long> userFriends = checkingIdUser(userId).getFriends();
+        // Проверяем, добавлен ли пользователь раннее в друзья
+        if (userFriends != null && userFriends.contains(friendId)) {
+            throw new NotFoundException("Пользователь уже находится в друзьях");
         }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId) {
-                Set<Long> userFriends = user.getFriends();
-                // Проверяем, добавлен ли пользователь раннее в друзья
-                if (userFriends != null && userFriends.contains(friendId)) {
-                    throw new NotFoundException("Пользователь уже находится в друзьях");
-                }
-                if (userFriends == null) {
-                    userFriends = new HashSet<>();
-                } else {
-                    // Создаем изменяемую копию
-                    userFriends = new HashSet<>(userFriends);
-                }
-                userFriends.add(friendId);
-                user.setFriends(userFriends);
-                for (User userFr : userStorage.findAll()) {
-                    if (userFr.getId() == friendId) {
-                        Set<Long> friendsUser = userFr.getFriends();
-                        if (friendsUser == null) {
-                            friendsUser = new HashSet<>();
-                        } else {
-                            // Создаем изменяемую копию
-                            friendsUser = new HashSet<>(friendsUser);
-                        }
-                        friendsUser.add(userId);
-                        userFr.setFriends(friendsUser);
-                        return;
-                    }
-                }
-            }
+        if (userFriends == null) {
+            userFriends = new HashSet<>();
+        } else {
+            // Создаем изменяемую копию
+            userFriends = new HashSet<>(userFriends);
         }
+        userFriends.add(friendId);
+        checkingIdUser(userId).setFriends(userFriends);
+
+        Set<Long> friendsUser = checkingIdUser(friendId).getFriends();
+        if (friendsUser == null) {
+            friendsUser = new HashSet<>();
+        } else {
+            // Создаем изменяемую копию
+            friendsUser = new HashSet<>(friendsUser);
+        }
+        friendsUser.add(userId);
+        checkingIdUser(friendId).setFriends(friendsUser);
     }
 
     public void deleteUserFriends(long userId, long friendId) {
         // Проверяем, есть ли пользователь
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == friendId);
-        if (!existsUser) {
-            throw new NotFoundException("Пользователь №1 не найден");
-        } else if (!existsUser2) {
-            throw new NotFoundException("Пользователь №2 не найден");
-        }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId && user.getFriends() == null) {
+        checkingIdUser(userId);
+        checkingIdUser(friendId);
+
+        if (checkingIdUser(userId).getId() == userId && checkingIdUser(userId).getFriends().contains(friendId)) {
+            Set<Long> userFriends = checkingIdUser(userId).getFriends();
+            userFriends = new HashSet<>(userFriends);
+            userFriends.remove(friendId);
+            checkingIdUser(userId).setFriends(userFriends);
+
+            if (checkingIdUser(friendId).getId() == friendId && checkingIdUser(friendId).getFriends().contains(userId)) {
+                Set<Long> friendsUser = checkingIdUser(userId).getFriends();
+                friendsUser = new HashSet<>(friendsUser);
+                friendsUser.remove(userId);
+                checkingIdUser(friendId).setFriends(friendsUser);
                 return;
             }
-            if (user.getId() == userId && user.getFriends().contains(friendId)) {
-                Set<Long> userFriends = user.getFriends();
-                userFriends = new HashSet<>(userFriends);
-                userFriends.remove(friendId);
-                user.setFriends(userFriends);
-                for (User userFr : userStorage.findAll()) {
-                    if (userFr.getId() == friendId && userFr.getFriends().contains(userId)) {
-                        Set<Long> friendsUser = user.getFriends();
-                        friendsUser = new HashSet<>(friendsUser);
-                        friendsUser.remove(userId);
-                        userFr.setFriends(friendsUser);
-                        return;
-                    }
-                }
-            }
         }
- throw new NotFoundException("Данный пользователь не лайкал данный фильм");
+        throw new NotFoundException("Данный пользователь не лайкал данный фильм");
     }
 
     public List<User> getlListFriends(long userId) {
         // Проверяем, есть ли пользователь
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        if (!(existsUser)) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        checkingIdUser(userId);
+
         List<User> listFrinds = new ArrayList<>();
-        for (User userList : userStorage.findAll()) {
-            if (userList.getId() == userId) {
-                if (userList.getFriends() == null) {
+
+                if (checkingIdUser(userId).getFriends() == null) {
                     return new ArrayList<>();
                 }
-                for (Long idFrinds: userList.getFriends()) {
+                for (Long idFrinds : checkingIdUser(userId).getFriends()) {
                     for (User user : userStorage.findAll()) {
                         if (user.getId() == idFrinds) {
                             listFrinds.add(user);
                         }
                     }
                 }
-            }
-        }
-
         return listFrinds;
     }
 
     public List<User> getCommonlLstFriends(long userId, long otherId) {
         // Проверяем, есть ли пользователь
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        boolean existsUser2 = userStorage.findAll().stream().anyMatch(users -> users.getId() == otherId);
-        if (!(existsUser || existsUser2)) {
-            throw new NotFoundException("Пользователь не найден");
-        }
+        checkingIdUser(userId);
+        checkingIdUser(otherId);
+
         Set<Long> userFriends = new HashSet<>();
         Set<Long> userFriends2 = new HashSet<>();
         List<Long> otherListId = new ArrayList<>();
         List<User> otherFriends = new ArrayList<>();
+
         for (User userList : userStorage.findAll()) {
             if (userList.getId() == userId) {
                 userFriends = userList.getFriends();

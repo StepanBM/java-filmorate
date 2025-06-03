@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.storage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -11,13 +10,14 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Long, Film> films = new HashMap<>();
 
-    private final Logger log = LoggerFactory.getLogger(FilmController.class);
+    private final Logger log = LoggerFactory.getLogger(InMemoryFilmStorage.class);
 
     @Override
     public Collection<Film> findAll() {
@@ -58,6 +58,11 @@ public class InMemoryFilmStorage implements FilmStorage {
                 log.error("Фильм с таким id не найден");
                 throw new NotFoundException("Фильм с id =" + newFilm.getId() + " не найден");
             }
+    }
+
+    @Override
+    public Optional<Film> findIdFilm(long id) {
+        return Optional.ofNullable(films.get(id));
     }
 
     private void getValidationFilm(Film film) {

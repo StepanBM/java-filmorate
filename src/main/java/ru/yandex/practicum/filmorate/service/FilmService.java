@@ -22,70 +22,59 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
+    public Film checkingIdFilm(long id) {
+        return filmStorage.findIdFilm(id).orElseThrow(() -> new NotFoundException("Фильм не найден"));
+    }
+
+    public User checkingIdUser(long id) {
+        return userStorage.findIdUser(id).orElseThrow(() -> new NotFoundException("Пользователь не найден"));
+    }
+
     public void addLike(long filmId, long userId) {
         // Проверяем, есть ли фильм и пользователь
-        boolean existsFilm = filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId);
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        if (!existsFilm) {
-            throw new NotFoundException("Фильм не найден");
-        } else if (!existsUser) {
-            throw new NotFoundException("Пользователь не найден");
+        checkingIdFilm(filmId);
+        checkingIdUser(userId);
+
+        Set<Long> filmLike = checkingIdUser(userId).getUserLikes();
+        // Проверяем, лайкнул ли пользователь фильм ранее
+        if (filmLike != null && filmLike.contains(filmId)) {
+            throw new NotFoundException("Пользователь лайкнул фильм раннее");
         }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId) {
-                Set<Long> filmLike = user.getUserLikes();
-                // Проверяем, лайкнул ли пользователь фильм ранее
-                if (filmLike != null && filmLike.contains(filmId)) {
-                    throw new NotFoundException("Пользователь лайкнул фильм раннее");
-                }
-                if (filmLike == null) {
-                    filmLike = new HashSet<>();
-                } else {
-                    // Создаем изменяемую копию
-                    filmLike = new HashSet<>(filmLike);
-                }
-                filmLike.add(filmId);
-                user.setUserLikes(filmLike);
-                break;
-            }
+        if (filmLike == null) {
+            filmLike = new HashSet<>();
+        } else {
+            // Создаем изменяемую копию
+            filmLike = new HashSet<>(filmLike);
         }
-        for (Film film : filmStorage.findAll()) {
-            if (film.getId() == filmId) {
-                if (film.getFilmLikesCount() == null) {
-                    film.setFilmLikesCount(1L);
-                    break;
-                } else {
-                    film.setFilmLikesCount(film.getFilmLikesCount() + 1L);
-                    break;
-                }
-            }
+        filmLike.add(filmId);
+        checkingIdUser(userId).setUserLikes(filmLike);
+
+        if (checkingIdFilm(filmId).getFilmLikesCount() == null) {
+            checkingIdFilm(filmId).setFilmLikesCount(1L);
+        } else {
+            checkingIdFilm(filmId).setFilmLikesCount(checkingIdFilm(filmId).getFilmLikesCount() + 1L);
         }
     }
 
     public void deleteLike(long filmId, long userId) {
         // Проверяем, есть ли фильм и пользователь
-        boolean existsFilm = filmStorage.findAll().stream().anyMatch(films -> films.getId() == filmId);
-        boolean existsUser = userStorage.findAll().stream().anyMatch(users -> users.getId() == userId);
-        if (!existsFilm) {
-            throw new NotFoundException("Фильм не найден");
-        } else if (!existsUser) {
-            throw new NotFoundException("Пользователь не найден");
-        }
-        for (User user : userStorage.findAll()) {
-            if (user.getId() == userId && user.getUserLikes().contains(filmId)) {
-                Set<Long> filmLike = user.getUserLikes();
+        checkingIdFilm(filmId);
+        checkingIdUser(userId);
+
+
+            if (checkingIdUser(userId).getId() == userId && checkingIdUser(userId).getUserLikes().contains(filmId)) {
+                Set<Long> filmLike = checkingIdUser(userId).getUserLikes();
                 filmLike = new HashSet<>(filmLike);
                 filmLike.remove(filmId);
-                user.setUserLikes(filmLike);
-                for (Film film : filmStorage.findAll()) {
-                    if (film.getId() == filmId) {
-                        film.setFilmLikesCount(film.getFilmLikesCount() - 1L);
-                        break;
+                checkingIdUser(userId).setUserLikes(filmLike);
+
+                    if (checkingIdFilm(filmId).getId() == filmId) {
+                        checkingIdFilm(filmId).setFilmLikesCount(checkingIdFilm(filmId).getFilmLikesCount() - 1L);
                     }
-                }
+
                 return;
             }
-        }
+
         throw new NotFoundException("Данный пользователь не лайкал данный фильм");
     }
 
