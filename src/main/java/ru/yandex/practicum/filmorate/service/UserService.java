@@ -59,6 +59,9 @@ public class UserService {
         checkingIdUser(userId);
         checkingIdUser(friendId);
 
+        if (checkingIdUser(userId).getId() == userId && checkingIdUser(userId).getFriends() == null) {
+            return;
+        }
         if (checkingIdUser(userId).getId() == userId && checkingIdUser(userId).getFriends().contains(friendId)) {
             Set<Long> userFriends = checkingIdUser(userId).getFriends();
             userFriends = new HashSet<>(userFriends);
@@ -73,7 +76,7 @@ public class UserService {
                 return;
             }
         }
-        throw new NotFoundException("Данный пользователь не лайкал данный фильм");
+        throw new NotFoundException("У данного пользователя нет в друзьях другого введенного пользователя");
     }
 
     public List<User> getlListFriends(long userId) {
@@ -82,16 +85,16 @@ public class UserService {
 
         List<User> listFrinds = new ArrayList<>();
 
-                if (checkingIdUser(userId).getFriends() == null) {
-                    return new ArrayList<>();
+        if (checkingIdUser(userId).getFriends() == null) {
+            return new ArrayList<>();
+        }
+        for (Long idFrinds : checkingIdUser(userId).getFriends()) {
+            for (User user : userStorage.findAll()) {
+                if (user.getId() == idFrinds) {
+                    listFrinds.add(user);
                 }
-                for (Long idFrinds : checkingIdUser(userId).getFriends()) {
-                    for (User user : userStorage.findAll()) {
-                        if (user.getId() == idFrinds) {
-                            listFrinds.add(user);
-                        }
-                    }
-                }
+            }
+        }
         return listFrinds;
     }
 
