@@ -1,9 +1,13 @@
-package ru.yandex.practicum.filmorate.controller;
+package ru.yandex.practicum.filmorate.storage;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
+
 import java.time.LocalDate;
 import java.util.Collection;
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,10 +15,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmControllerTest {
 
     private FilmController filmController;
+    private final InMemoryFilmStorage inMemoryFilmStorage = new InMemoryFilmStorage();
+    private FilmStorage filmStorage;
+    private UserStorage userStorage;
+
+    private final FilmService filmService = new FilmService(filmStorage, userStorage);
 
     @BeforeEach
     public void setUp() {
-        filmController = new FilmController();
+        filmController = new FilmController(inMemoryFilmStorage, filmService);
     }
 
     // Вспомогательный метод для создания фильма
@@ -26,6 +35,7 @@ public class FilmControllerTest {
         film.setDuration(70);
         return film;
     }
+
 
     // Вспомогательный метод для обновления фильма
     private Film updateValidFilm() {
@@ -62,6 +72,7 @@ public class FilmControllerTest {
         filmController.create(film);
 
         Film newFilm = updateValidFilm();
+
         Film updatedFilm = filmController.update(newFilm);
 
         assertEquals(1, updatedFilm.getId());
@@ -89,7 +100,6 @@ public class FilmControllerTest {
                 () -> {
                     filmController.create(film);
                 });
-
         assertEquals("Дата релиза должна быть не раньше 28 декабря 1895 года", exception.getMessage());
     }
 
@@ -102,11 +112,10 @@ public class FilmControllerTest {
         Film newFilm = updateValidFilm();
         newFilm.setId(5);
 
-        ValidationException exception = assertThrows(ValidationException.class,
+        NotFoundException exception = assertThrows(NotFoundException.class,
                 () -> {
                     filmController.update(newFilm);
                 });
-
         assertEquals("Фильм с id =" + newFilm.getId() + " не найден", exception.getMessage());
     }
 
