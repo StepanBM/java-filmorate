@@ -25,10 +25,7 @@ public class BaseRepository<T> {
         try {
             T result = jdbc.queryForObject(query, mapper, params);
             return Optional.ofNullable(result);
-        }  catch (EmptyResultDataAccessException e) {
-            return Optional.empty();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new NotFoundException("Не удалось найти данные");
         }
     }
