@@ -1,12 +1,14 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
+
 import java.time.LocalDate;
 import java.util.List;
 
-public class Film {
-
-    private long id;
+public class NewFilmRequest {
 
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
@@ -22,22 +24,9 @@ public class Film {
     @NotNull(message = "Продолжительность фильма не может быть null")
     private long duration;
 
-    // количество лайков у фильма
-    private Long filmLikesCount;
+    private NewRatingMpaRequest mpa;
 
-    // рейтинг фильма
-    private RatingMpa rating; // например, G, PG, PG-13, R, NC-17
-
-    // список жанров
-    private List<Genre> genres;
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
+    private List<NewGenreRequest> genres;
 
     public String getName() {
         return name;
@@ -71,29 +60,19 @@ public class Film {
         this.duration = duration;
     }
 
-    public Long getFilmLikesCount() {
-        return filmLikesCount;
+    public NewRatingMpaRequest getMpa() {
+        return mpa;
     }
 
-    public void setFilmLikesCount(Long filmLikesCount) {
-        this.filmLikesCount = filmLikesCount;
+    public void setMpa(NewRatingMpaRequest mpa) {
+        this.mpa = mpa;
     }
 
-
-
-    public RatingMpa getRating() {
-        return rating;
-    }
-
-    public void setRating(RatingMpa rating) {
-        this.rating = rating;
-    }
-
-    public List<Genre> getGenres() {
+    public List<NewGenreRequest> getGenres() {
         return genres;
     }
 
-    public void setGenres(List<Genre> genres) {
+    public void setGenres(List<NewGenreRequest> genres) {
         this.genres = genres;
     }
 }
