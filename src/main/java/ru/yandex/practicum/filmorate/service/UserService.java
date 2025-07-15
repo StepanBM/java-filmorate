@@ -49,12 +49,22 @@ public class UserService implements UserInterfaceService {
     @Override
     public List<UserDto> getUsers() {
         List<User> users = userRepository.findAll();
+
+        // Получаем все лайки для всех пользователей одним запросом
+        Map<Long, List<Long>> userLikesMap = userRepository.findAllLikesGrouped();
+
+        // Распределяем лайки по пользователям
+        for (User user : users) {
+            List<Long> likes = userLikesMap.get(user.getId());
+            if (likes == null) {
+                likes = new ArrayList<>();
+            }
+            user.setUserLikes(new HashSet<>(likes));
+        }
+
+        // Преобразуем список пользователей в список DTO для возврата
         return users.stream()
-                .map(user -> {
-                    List<Long> userLike = userRepository.findLikeByUserId(user.getId());
-                    user.setUserLikes(new HashSet<>(userLike));
-                    return user;
-                }).map(UserMapper::mapToUserDto)
+                .map(UserMapper::mapToUserDto)
                 .collect(Collectors.toList());
     }
 

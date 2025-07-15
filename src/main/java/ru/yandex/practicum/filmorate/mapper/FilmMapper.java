@@ -79,15 +79,15 @@ public final class FilmMapper {
         if (request.hasFilDuration()) {
             film.setDuration(request.getDuration());
         }
-        if (request.hasRatingId()) {
-            if (request.getRatingId() != 0) {
-                RatingMpa rating = new RatingMpa();
-                rating.setId(request.getRatingId());
-                film.setRating(rating);
-            } else {
-                film.setRating(null);
-            }
-        }
+//        if (request.hasRatingId()) {
+//            if (request.getRatingId() != 0) {
+//                RatingMpa rating = new RatingMpa();
+//                rating.setId(request.getRatingId());
+//                film.setRating(rating);
+//            } else {
+//                film.setRating(null);
+//            }
+//        }
 
         return film;
     }

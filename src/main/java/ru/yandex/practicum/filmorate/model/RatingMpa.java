@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.model;
 
 public class RatingMpa {
-    protected Integer id;
-    protected String name;
+    private Integer id;
+    private String name;
 
     public String getName() {
         return name;

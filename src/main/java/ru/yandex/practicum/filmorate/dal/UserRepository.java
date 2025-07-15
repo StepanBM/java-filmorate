@@ -30,6 +30,7 @@ public class UserRepository extends BaseRepository<User> {
                     "JOIN user_friends uf2 ON u.id = uf2.friend_id AND uf2.user_id = ?";
     private static final String FIND_USER_LIKE = "SELECT ul.film_id FROM user_likes ul WHERE ul.user_id = ?";
     private static final String FIND_FRIENDS_ID = "SELECT friend_id FROM user_friends WHERE user_id = ?";
+    private static final String FIND_ALL_USER_LIKE = "SELECT user_id, film_id FROM user_likes";
 
     public UserRepository(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -37,6 +38,23 @@ public class UserRepository extends BaseRepository<User> {
 
     public List<User> findAll() {
         return findMany(FIND_ALL_QUERY);
+    }
+
+    public Map<Long, List<Long>> findAllLikesGrouped() {
+        List<Map<String, Object>> rows = jdbc.queryForList(FIND_ALL_USER_LIKE);
+        Map<Long, List<Long>> result = new HashMap<>();
+        for (Map<String, Object> row : rows) {
+            Integer userId = (Integer) row.get("user_id");
+            Integer filmId = (Integer) row.get("film_id");
+            Long key = Long.valueOf(userId);
+            List<Long> list = result.get(key);
+            if (list == null) {
+                list = new ArrayList<>();
+                result.put(key, list);
+            }
+            list.add(Long.valueOf(filmId));
+        }
+        return result;
     }
 
     public Optional<User> findById(long id) {

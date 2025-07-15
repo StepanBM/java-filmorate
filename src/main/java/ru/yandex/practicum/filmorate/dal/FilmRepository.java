@@ -3,9 +3,12 @@ package ru.yandex.practicum.filmorate.dal;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.dal.mappers.FilmGenresRowMapper;
 import ru.yandex.practicum.filmorate.dal.mappers.GenreRowMapper;
+import ru.yandex.practicum.filmorate.dto.FilmGenres;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.time.LocalDate;
 import java.util.*;
 
@@ -48,8 +51,21 @@ public class FilmRepository extends BaseRepository<Film> {
             "ORDER BY filmLikesCount DESC " +
             "LIMIT ?";
 
+    private static final String GET_ALL_FILMS_WITH_GENRES_QUERY =
+            "SELECT f.id as film_id, f.name, f.description, f.release_date, f.duration, f.rating_id," +
+                    "     r.rating_name, g.genres_id as genre_id, g.name as genre_name, fl.likes_count AS filmLikesCount " +
+                    "FROM films f " +
+                    "LEFT JOIN (" +
+                    "     SELECT film_id, COUNT(*) AS likes_count " +
+                    "     FROM user_likes " +
+                    "     GROUP BY film_id " +
+                    ") fl ON f.id = fl.film_id " +
+                    "LEFT JOIN film_genres fg ON f.id = fg.film_id " +
+                    "LEFT JOIN genres g ON fg.genre_id = g.genres_id " +
+                    "LEFT JOIN rating_films r ON f.rating_id = r.rating_id ";
 
-    private static final String INSERT_GENRE_RELATION = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+    private static final String INSERT_FILM_GENRES_BATCH =
+            "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
     public FilmRepository(JdbcTemplate jdbc, RowMapper<Film> mapper) {
         super(jdbc, mapper);
@@ -81,6 +97,10 @@ public class FilmRepository extends BaseRepository<Film> {
         if (count != null && count > 0) {
             jdbc.update(DELETE_LIKE, filmId, userId);
         }
+    }
+
+    public List<FilmGenres> getAllFilmsGenres() {
+        return jdbc.query(GET_ALL_FILMS_WITH_GENRES_QUERY, new FilmGenresRowMapper());
     }
 
     public List<Genre> findGenresByFilmId(long filmId) {
@@ -126,9 +146,19 @@ public class FilmRepository extends BaseRepository<Film> {
     }
 
     public void saveFilmGenres(long filmId, List<Genre> genres) {
+        List<Object[]> batchArgs = new ArrayList<>();
         for (Genre genre : genres) {
-            jdbc.update(INSERT_GENRE_RELATION, filmId, genre.getId());
+            // Создаем массив объектов для текущего жанра
+            Object[] args = new Object[2];
+            // Первый элемент — id фильма
+            args[0] = filmId;
+            // Второй элемент — id жанра
+            args[1] = genre.getId();
+            // Добавляем массив аргументов в список batchArgs
+            batchArgs.add(args);
         }
+        // Выполняем пакетную вставку
+        jdbc.batchUpdate(INSERT_FILM_GENRES_BATCH, batchArgs);
     }
 
     public Film update(Film film) {

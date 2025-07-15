@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.model;
 
 public class Genre {
 
-    protected Integer id;
-    protected String name;
+    private Integer id;
+    private String name;
 
     public Integer getId() {
         return id;
