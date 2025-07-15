@@ -1,34 +1,27 @@
-package ru.yandex.practicum.filmorate.model;
+package ru.yandex.practicum.filmorate.dto;
 
-import jakarta.validation.constraints.*;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import ru.yandex.practicum.filmorate.model.Genre;
+
 import java.time.LocalDate;
 import java.util.List;
 
-public class Film {
+public class FilmDto {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private long id;
-
-    @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
-
-    @Size(max = 200, message = "Описание фильма превышает длину в 200 символов")
-    @NotNull(message = "Описание фильма не может быть null")
     private String description;
-
-    @NotNull(message = "Дата релиза фильма не может быть null")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDate releaseDate;
-
-    @Positive(message = "Продолжительность фильма должна быть положительным числом")
-    @NotNull(message = "Продолжительность фильма не может быть null")
     private long duration;
 
-    // количество лайков у фильма
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private RatingMpaDto mpa;
+
     private Long filmLikesCount;
 
-    // рейтинг фильма
-    private RatingMpa rating; // например, G, PG, PG-13, R, NC-17
-
-    // список жанров
     private List<Genre> genres;
 
     public long getId() {
@@ -79,15 +72,14 @@ public class Film {
         this.filmLikesCount = filmLikesCount;
     }
 
-
-
-    public RatingMpa getRating() {
-        return rating;
+    public RatingMpaDto getMpa() {
+        return mpa;
     }
 
-    public void setRating(RatingMpa rating) {
-        this.rating = rating;
+    public void setMpa(RatingMpaDto mpa) {
+        this.mpa = mpa;
     }
+
 
     public List<Genre> getGenres() {
         return genres;

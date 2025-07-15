@@ -2,141 +2,171 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.storage.InMemoryUserStorage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
+import ru.yandex.practicum.filmorate.dal.UserRepository;
+import ru.yandex.practicum.filmorate.dal.mappers.UserRowMapper;
+import ru.yandex.practicum.filmorate.dto.*;
+import ru.yandex.practicum.filmorate.mapper.UserMapper;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
+@JdbcTest
+@AutoConfigureTestDatabase
+@Import({
+        UserRepository.class,
+        UserService.class,
+        UserRowMapper.class,
+        UserMapper.class
+})
 public class UserServiceTest {
 
-    private UserController userController;
-    private InMemoryUserStorage inMemoryUserStorage;
-    private UserService userService;
+    private final UserRepository userRepository;
+    private final UserService userService;
+    // Добавляем JdbcTemplate для очистки БД
+    private final JdbcTemplate jdbcTemplate;
+
+    NewUserRequest newUser1;
+    NewUserRequest newUser2;
+    NewUserRequest newUser3;
+
+    @Autowired
+    public UserServiceTest(UserRepository userRepository, UserService userService, JdbcTemplate jdbcTemplate) {
+        this.userRepository = userRepository;
+        this.userService = userService;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @BeforeEach
-    public void setUp() {
-        inMemoryUserStorage = new InMemoryUserStorage();
-        userService = new UserService(inMemoryUserStorage);
-        userController = new UserController(inMemoryUserStorage, userService);
-    }
+    void setUp() {
+        jdbcTemplate.execute("ALTER TABLE users ALTER COLUMN id RESTART WITH 1");
 
-    private User createValidUser1() {
-        User user = new User();
-        user.setEmail("BigBos@mail.ru");
-        user.setLogin("Arak101010");
-        user.setName("Alexander");
-        user.setBirthday(LocalDate.of(1997, 7, 3));
-        return user;
-    }
+        newUser1 = new NewUserRequest();
+        newUser1.setName("Тестовый пользователь №1");
+        newUser1.setLogin("Slava0101");
+        newUser1.setEmail("mail111@yandex.ru");
+        newUser1.setBirthday(LocalDate.of(1997, 11, 15));
 
-    private User createValidUser2() {
-        User user2 = new User();
-        user2.setEmail("Jumal@mail.ru");
-        user2.setLogin("Jum112");
-        user2.setName("Sergey");
-        user2.setBirthday(LocalDate.of(1999, 7, 3));
-        return user2;
-    }
+        newUser2 = new NewUserRequest();
+        newUser2.setName("Тестовый пользователь №2");
+        newUser2.setLogin("Step007");
+        newUser2.setEmail("mail222@yandex.ru");
+        newUser2.setBirthday(LocalDate.of(1999, 10, 9));
 
-    @Test
-    public void testAddFriends() {
+        newUser3 = new NewUserRequest();
+        newUser3.setName("Тестовый пользователь №3");
+        newUser3.setLogin("Jun33");
+        newUser3.setEmail("mail333@yandex.ru");
+        newUser3.setBirthday(LocalDate.of(2003, 1, 21));
 
-        User user = createValidUser1();
-        User user2 = createValidUser2();
-
-        User createdUser = userController.create(user);
-        User createdUser2 = userController.create(user2);
-
-        assertNotNull(createdUser);
-        assertNotNull(createdUser2);
-
-        userService.addFriends(user2.getId(), user.getId());
-
-        assertTrue(user.getFriends().contains(2L));
-        assertTrue(user2.getFriends().contains(1L));
-
-        assertEquals(Set.of(2L), user.getFriends());
-        assertEquals(Set.of(1L), user2.getFriends());
     }
 
     @Test
-    public void testDeleteUserFriends() {
+    void createUserTest() {
 
-        User user = createValidUser1();
-        User user2 = createValidUser2();
-
-        User createdUser = userController.create(user);
-        User createdUser2 = userController.create(user2);
-
-        assertNotNull(createdUser);
-        assertNotNull(createdUser2);
-
-        userService.addFriends(user2.getId(), user.getId());
-
-        assertTrue(user.getFriends().contains(2L));
-        assertTrue(user2.getFriends().contains(1L));
-
-        userService.deleteUserFriends(user.getId(), user2.getId());
-
-        assertTrue(user.getFriends().isEmpty());
-        assertTrue(user2.getFriends().isEmpty());
+        UserDto createdUser = userService.createUser(newUser3);
+        assertThat(createdUser).isNotNull();
+        assertThat(createdUser.getName()).isEqualTo("Тестовый пользователь №3");
+        assertThat(createdUser.getLogin()).isEqualTo("Jun33");
+        assertThat(createdUser.getEmail()).isEqualTo("mail333@yandex.ru");
+        assertThat(createdUser.getBirthday()).isEqualTo("2003-01-21");
     }
 
     @Test
-    public void testGetlListFriends() {
+    void getUsersTest() {
+        userService.createUser(newUser1);
+        userService.createUser(newUser2);
+        userService.createUser(newUser3);
+        List<User> users = userRepository.findAll();
 
-        User user = createValidUser1();
-        User user2 = createValidUser2();
-
-        User createdUser = userController.create(user);
-        User createdUser2 = userController.create(user2);
-
-        assertNotNull(createdUser);
-        assertNotNull(createdUser2);
-
-        userService.addFriends(user2.getId(), user.getId());
-
-        assertTrue(user.getFriends().contains(2L));
-        assertTrue(user2.getFriends().contains(1L));
-
-        List<User> userFriend = userService.getlListFriends(user2.getId());
-
-        assertTrue(userFriend.contains(user));
+        assertThat(users).hasSize(3);
+        assertThat(users.get(0).getName()).isEqualTo("Тестовый пользователь №1");
+        assertThat(users.get(1).getName()).isEqualTo("Тестовый пользователь №2");
+        assertThat(users.get(2).getName()).isEqualTo("Тестовый пользователь №3");
     }
 
     @Test
-    public void testGetCommonlLstFriends() {
+    void updateFilmTest() {
 
-        User user = createValidUser1();
-        User user2 = createValidUser2();
+        userService.createUser(newUser1);
 
-        User user3 = new User();
-        user3.setEmail("Jumal@mail.ru");
-        user3.setLogin("Jum112");
-        user3.setName("Sergey");
-        user3.setBirthday(LocalDate.of(1999, 7, 3));
+        User userUpdate = new User();
+        userUpdate.setId(1L);
+        userUpdate.setName("Обновленное имя пользователя");
+        userUpdate.setLogin("Login");
+        userUpdate.setEmail("newEmail@yandex.ru");
+        userUpdate.setBirthday(LocalDate.of(1999, 9, 23));
 
-        User createdUser = userController.create(user);
-        User createdUser2 = userController.create(user2);
-        User createdUser3 = userController.create(user3);
+        userRepository.update(userUpdate);
 
-        assertNotNull(createdUser);
-        assertNotNull(createdUser2);
-        assertNotNull(createdUser3);
-
-        userService.addFriends(user2.getId(), user3.getId());
-        userService.addFriends(user.getId(), user3.getId());
-
-        List<User> userFriendOther = userService.getCommonlLstFriends(user.getId(), user2.getId());
-
-        assertTrue(userFriendOther.contains(user3));
+        // Получаем обновленный фильм из БД и проверяем, что данные изменились
+        Optional<User> updatedUserOptional = userRepository.findById(1);
+        assertThat(updatedUserOptional)
+                .isPresent()
+                .hasValueSatisfying(user -> {
+                    assertThat(user.getName()).isEqualTo("Обновленное имя пользователя");
+                    assertThat(user.getLogin()).isEqualTo("Login");
+                    assertThat(user.getEmail()).isEqualTo("newEmail@yandex.ru");
+                    assertThat(user.getBirthday()).isEqualTo("1999-09-23");
+                });
     }
 
+    @Test
+    void addFriendsTest() {
+        UserDto userDto1 = userService.createUser(newUser1);
+        UserDto userDto2 = userService.createUser(newUser2);
+        long newUser1Id = userDto1.getId();
+        long newUser2Id = userDto2.getId();
+
+        userService.addFriends(userDto1.getId(), userDto2.getId());
+
+        List<User> users = userService.getlListFriends(newUser1Id);
+
+        assertThat(users).extracting("id").contains(newUser2Id);
+    }
+
+    @Test
+    void deleteFriendsTest() {
+        UserDto userDto1 = userService.createUser(newUser1);
+        UserDto userDto2 = userService.createUser(newUser2);
+        long newUser1Id = userDto1.getId();
+        long newUser2Id = userDto2.getId();
+
+        userService.addFriends(newUser1Id, newUser2Id);
+
+        List<User> users = userService.getlListFriends(newUser1Id);
+
+        assertThat(users).extracting("id").contains(newUser2Id);
+
+        userService.deleteFriends(newUser1Id, newUser2Id);
+
+        List<User> usersDelete = userService.getlListFriends(newUser1Id);
+
+        assertThat(usersDelete).extracting("id").doesNotContain(newUser2Id);
+    }
+
+    @Test
+    void getCommonListFriendsTest() {
+        UserDto userDto1 = userService.createUser(newUser1);
+        UserDto userDto2 = userService.createUser(newUser2);
+        UserDto userDto3 = userService.createUser(newUser3);
+        long newUser1Id = userDto1.getId();
+        long newUser2Id = userDto2.getId();
+        long newUser3Id = userDto3.getId();
+
+        userService.addFriends(newUser1Id, newUser3Id);
+        userService.addFriends(newUser2Id, newUser3Id);
+
+        List<User> commonFriends = userService.getCommonListFriends(newUser1Id, newUser2Id);
+        assertThat(commonFriends).extracting("id").contains(newUser3Id);
+
+    }
 }
